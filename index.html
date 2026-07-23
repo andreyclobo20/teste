@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Osasco | Histórias & Curiosidades</title>
+  <style>
+    /* ==========================================================================
+       1. VARIÁVEIS E RESET (Design Tokens)
+       ========================================================================== */
+    :root {
+      --bg-primary: #0f172a;
+      --bg-card: rgba(30, 41, 59, 0.7);
+      --bg-card-hover: rgba(51, 65, 85, 0.8);
+      --accent-orange: #f97316;
+      --accent-yellow: #facc15;
+      --accent-blue: #38bdf8;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: rgba(255, 255, 255, 0.1);
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ==========================================================================
+       2. LAYOUT & HIERARQUIA
+       ========================================================================== */
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    header {
+      padding: 4rem 0 2rem;
+      text-align: center;
+      position: relative;
+    }
+
+    header::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(249,115,22,0.15) 0%, rgba(15,23,42,0) 70%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.35rem 1rem;
+      background: rgba(249, 115, 22, 0.15);
+      color: var(--accent-orange);
+      border: 1px solid rgba(249, 115, 22, 0.3);
+      border-radius: 999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      letter-spacing: 0.5px;
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 5vw, 3.8rem);
+      font-weight: 800;
+      letter-spacing: -1px;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.125rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* ==========================================================================
+       3. ESTATÍSTICAS RÁPIDAS
+       ========================================================================== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+      margin: 3rem 0;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      text-align: center;
+      transition: var(--transition);
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(249, 115, 22, 0.4);
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent-orange);
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    /* ==========================================================================
+       4. CARDS DE CURIOSIDADES
+       ========================================================================== */
+    .filter-bar {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 0.5rem 1.25rem;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--accent-orange);
+      color: #fff;
+      border-color: var(--accent-orange);
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 4rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: var(--transition);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      background: var(--bg-card-hover);
+      transform: translateY(-6px);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .card-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .card-category {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent-blue);
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-title {
+      font-size: 1.35rem;
+      margin-bottom: 0.75rem;
+      color: var(--text-main);
+    }
+
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+    }
+
+    /* ==========================================================================
+       5. COMPONENTE INTERATIVO: MONTADOR DE DOGÃO
+       ========================================================================== */
+    .interactive-section {
+      background: linear-gradient(180deg, rgba(30,41,59,0.5) 0%, rgba(15,23,42,0.8) 100%);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      margin-bottom: 4rem;
+      text-align: center;
+    }
+
+    .interactive-title {
+      font-size: 1.75rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .ingredients-grid {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin: 1.5rem 0;
+    }
+
+    .ing-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 0.6rem 1rem;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: var(--transition);
+      user-select: none;
+    }
+
+    .ing-btn.selected {
+      background: rgba(250, 204, 21, 0.2);
+      border-color: var(--accent-yellow);
+      color: var(--accent-yellow);
+    }
+
+    .dog-display {
+      background: rgba(0,0,0,0.3);
+      padding: 1.5rem;
+      border-radius: var(--radius-md);
+      min-height: 80px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .dog-tag {
+      background: var(--accent-orange);
+      color: #fff;
+      padding: 0.3rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      animation: popIn 0.2s ease-out;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* ==========================================================================
+       6. RODAPÉ
+       ========================================================================== */
+    footer {
+      margin-top: auto;
+      padding: 2rem 0;
+      border-top: 1px solid var(--border-color);
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    /* Responsividade */
+    @media (max-width: 600px) {
+      header { padding: 2.5rem 0 1.5rem; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .interactive-section { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <span class="badge">SÃO PAULO - BRASIL</span>
+      <h1>Descubra Osasco</h1>
+      <p class="subtitle">Histórias surpreendentes, marcos econômicos e curiosidades da cidade que vai muito além da "Capital do Cachorro-Quente".</p>
+    </header>
+
+    <!-- Stats rápidas -->
+    <section class="stats-grid">
+      <div class="stat-card">
+        <span class="stat-number">2º Maior</span>
+        <span class="stat-label">PIB do Estado de SP</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">1910</span>
+        <span class="stat-label">1º Voo da América Latina</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">+300</span>
+        <span class="stat-label">Carrinhos de Dogão Licenciados</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-number">1962</span>
+        <span class="stat-label">Ano de Emancipação</span>
+      </div>
+    </section>
+
+    <!-- Barra de Filtros -->
+    <div class="filter-bar">
+      <button class="filter-btn active" data-filter="all">Todas</button>
+      <button class="filter-btn" data-filter="historia">História</button>
+      <button class="filter-btn" data-filter="gastronomia">Gastronomia</button>
+      <button class="filter-btn" data-filter="economia">Economia</button>
+    </div>
+
+    <!-- Grid de Curiosidades -->
+    <main class="cards-grid" id="cards-container">
+      <!-- Inserido dinamicamente via JS -->
+    </main>
+
+    <!-- Interativo: Monte seu Dogão de Osasco -->
+    <section class="interactive-section">
+      <h2 class="interactive-title">🌭 Monte o Dogão Raiz de Osasco</h2>
+      <p class="subtitle">Selecione os ingredientes. Em Osasco, quanto mais recheio, melhor!</p>
+      
+      <div class="ingredients-grid" id="ingredients-container">
+        <!-- Botoes de ingredientes JS -->
+      </div>
+
+      <div class="dog-display" id="dog-display">
+        <span style="color: var(--text-muted);">Clique nos ingredientes para montar...</span>
+      </div>
+    </section>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>Desenvolvido com Vanilla JS, HTML5 e CSS3 — Curiosidades de Osasco</p>
+  </footer>
+
+  <!-- ==========================================================================
+     7. JAVASCRIPT (Lógica & Renderização)
+     ========================================================================== -->
+  <script>
+    // Data Source: Curiosidades de Osasco
+    const curiosidades = [
+      {
+        id: 1,
+        categoria: 'gastronomia',
+        icon: '🌭',
+        titulo: 'A Capital do Cachorro-Quente',
+        descricao: 'Osasco consome mais de 40 mil cachorros-quentes por dia! A cidade tem a maior concentração de carrinhos licenciados do país e o purê de batata é ingrediente obrigatório indiscutível.'
+      },
+      {
+        id: 2,
+        categoria: 'historia',
+        icon: '✈️',
+        titulo: 'Primeiro Voo da América Latina',
+        descricao: 'Em 1910, o inventor Dmitri Sensaud de Lavaud realizou em Osasco o primeiro voo de avião da América Latina a bordo do "São Paulo", percorrendo 103 metros em 6 segundos.'
+      },
+      {
+        id: 3,
+        categoria: 'economia',
+        icon: '💼',
+        titulo: 'Polo das Big Techs e Finanças',
+        descricao: 'Osasco possui o 2º maior PIB do estado de São Paulo e o 7º do Brasil. É sede da Cidade de Deus (Bradesco) e de gigantes como Mercado Livre, iFood e Uber.'
+      },
+      {
+        id: 4,
+        categoria: 'historia',
+        icon: '🇮🇹',
+        titulo: 'Origem do Nome Italiana',
+        descricao: 'O fundador da vila, o italiano Antonio Agù, batizou o local em homenagem à sua terra natal: a comuna de Osasco, situada na região do Piemonte, na Itália.'
+      },
+      {
+        id: 5,
+        categoria: 'economia',
+        icon: '🛍️',
+        titulo: '2º Maior Calçadão Comercial',
+        descricao: 'O Calçadão da Rua Antônio Agu é o segundo maior polo de comércio de rua do Brasil, ficando atrás apenas da famosa Rua 25 de Março na capital.'
+      },
+      {
+        id: 6,
+        categoria: 'historia',
+        icon: '📜',
+        titulo: 'Emancipação em 1962',
+        descricao: 'Osasco foi um distrito do município de São Paulo até 1962, quando conquistou sua autonomia política após um histórico plebiscito popular.'
+      }
+    ];
+
+    // Ingredientes para o mini-app interativo
+    const ingredientesDogao = [
+      'Pão de Leite', 'Salsicha Dulpla', 'Purê de Batata', 
+      'Vinagrete', 'Milho', 'Ervilha', 'Batata Palha', 
+      'Maionese Temperada', 'Queijo Ralado', 'Bacon Crisp'
+    ];
+
+    // Elementos DOM
+    const cardsContainer = document.getElementById('cards-container');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const ingredientsContainer = document.getElementById('ingredients-container');
+    const dogDisplay = document.getElementById('dog-display');
+
+    // Estado da aplicação
+    let ingredienteSelecionados = new Set(['Pão de Leite', 'Salsicha Dulpla', 'Purê de Batata']);
+
+    // 1. Renderizar Cards de Curiosidades
+    function renderCards(filter = 'all') {
+      cardsContainer.innerHTML = '';
+      
+      const filteredData = filter === 'all' 
+        ? curiosidades 
+        : curiosidades.filter(c => c.categoria === filter);
+
+      filteredData.forEach(item => {
+        const card = document.createElement('article');
+        card.className = 'card';
+        card.innerHTML = `
+          <div>
+            <div class="card-icon">${item.icon}</div>
+            <span class="card-category">${item.categoria}</span>
+            <h3 class="card-title">${item.titulo}</h3>
+            <p class="card-desc">${item.descricao}</p>
+          </div>
+        `;
+        cardsContainer.appendChild(card);
+      });
+    }
+
+    // 2. Filtros de Categoria
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderCards(btn.dataset.filter);
+      });
+    });
+
+    // 3. Montador Interativo de Dogão
+    function initDogBuilder() {
+      ingredientsContainer.innerHTML = '';
+      
+      ingredientesDogao.forEach(ing => {
+        const btn = document.createElement('button');
+        btn.className = `ing-btn ${ingredienteSelecionados.has(ing) ? 'selected' : ''}`;
+        btn.textContent = ing;
+        
+        btn.addEventListener('click', () => {
+          if (ingredienteSelecionados.has(ing)) {
+            ingredienteSelecionados.delete(ing);
+          } else {
+            ingredienteSelecionados.add(ing);
+          }
+          btn.classList.toggle('selected');
+          updateDogDisplay();
+        });
+
+        ingredientsContainer.appendChild(btn);
+      });
+
+      updateDogDisplay();
+    }
+
+    function updateDogDisplay() {
+      dogDisplay.innerHTML = '';
+      
+      if (ingredienteSelecionados.size === 0) {
+        dogDisplay.innerHTML = `<span style="color: var(--text-muted);">Sem ingredientes! Isso é só um pão seco...</span>`;
+        return;
+      }
+
+      ingredienteSelecionados.forEach(ing => {
+        const tag = document.createElement('span');
+        tag.className = 'dog-tag';
+        tag.textContent = ing;
+        dogDisplay.appendChild(tag);
+      });
+    }
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCards();
+      initDogBuilder();
+    });
+  </script>
+</body>
+</html>
